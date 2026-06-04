@@ -7,15 +7,19 @@
   <style>
     :root {
       --ink: #17212b;
-      --muted: #637083;
-      --line: #d8e0e8;
-      --page: #f6f8fb;
+      --muted: #6d7785;
+      --line: #d4dbe2;
+      --page: #eef2f0;
       --panel: #ffffff;
-      --green: #16784f;
-      --clay: #bb5837;
-      --blue: #245f9f;
-      --amber: #a66405;
-      --shadow: 0 10px 28px rgba(29, 46, 65, 0.09);
+      --green: #0f8f5f;
+      --lime: #9bd43a;
+      --clay: #b84d32;
+      --blue: #1d5f85;
+      --amber: #b56c00;
+      --red: #b9322b;
+      --nav: #101820;
+      --nav-soft: #172531;
+      --shadow: 0 8px 22px rgba(20, 32, 42, 0.08);
     }
 
     * { box-sizing: border-box; }
@@ -25,6 +29,7 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
       background: var(--page);
+      font-variant-numeric: tabular-nums;
     }
 
     button, input, select {
@@ -38,8 +43,8 @@
     }
 
     aside {
-      background: #fdfdfd;
-      border-right: 1px solid var(--line);
+      background: var(--nav);
+      border-right: 1px solid #263846;
       padding: 20px;
       position: sticky;
       top: 0;
@@ -65,9 +70,23 @@
       display: grid;
       place-items: center;
       border-radius: 8px;
-      background: var(--clay);
-      color: white;
+      background: var(--lime);
+      color: #122015;
       font-weight: 800;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    aside h1,
+    aside .subtle {
+      color: white;
+    }
+
+    aside .subtle {
+      color: #a9b8c3;
+    }
+
+    aside .footer-note {
+      color: #8296a5;
     }
 
     h1, h2, h3, p {
@@ -97,6 +116,10 @@
       text-transform: uppercase;
     }
 
+    aside label {
+      color: #95a7b5;
+    }
+
     input, select {
       width: 100%;
       border: 1px solid var(--line);
@@ -106,13 +129,20 @@
       color: var(--ink);
     }
 
+    aside input,
+    aside select {
+      border-color: #304353;
+      background: #0c141b;
+      color: white;
+    }
+
     .segmented {
       display: grid;
       grid-template-columns: 1fr 1fr;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
-      background: white;
+      background: #0c141b;
       margin-bottom: 18px;
     }
 
@@ -121,13 +151,13 @@
       background: transparent;
       padding: 10px 8px;
       cursor: pointer;
-      color: var(--muted);
+      color: #9babb7;
       min-height: 40px;
     }
 
     .segmented button.active {
-      background: var(--ink);
-      color: white;
+      background: var(--lime);
+      color: #111b14;
     }
 
     .button-row {
@@ -141,11 +171,11 @@
       height: 40px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: white;
+      background: #0c141b;
       cursor: pointer;
       display: grid;
       place-items: center;
-      color: var(--ink);
+      color: white;
     }
 
     .primary {
@@ -153,7 +183,7 @@
       min-height: 42px;
       border: 0;
       border-radius: 8px;
-      background: var(--blue);
+      background: var(--green);
       color: white;
       font-weight: 750;
       cursor: pointer;
@@ -182,8 +212,41 @@
     }
 
     .topbar h2 {
-      font-size: 28px;
+      font-size: 26px;
       letter-spacing: 0;
+    }
+
+    .market-rail {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 8px;
+      border: 1px solid #cbd6dc;
+      border-radius: 8px;
+      background: #172531;
+      color: white;
+    }
+
+    .market-chip {
+      min-height: 58px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #0c141b;
+      display: grid;
+      gap: 3px;
+    }
+
+    .market-chip span {
+      color: #9fb1bd;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .market-chip strong {
+      color: var(--lime);
+      font-size: 18px;
     }
 
     .grid {
@@ -201,13 +264,13 @@
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
     .panel-head {
-      padding: 16px 16px 12px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -218,6 +281,7 @@
     .panel-title {
       font-size: 15px;
       font-weight: 800;
+      text-transform: uppercase;
     }
 
     .pill {
@@ -225,8 +289,8 @@
       align-items: center;
       min-height: 26px;
       padding: 4px 8px;
-      border-radius: 999px;
-      background: #eef3f8;
+      border-radius: 6px;
+      background: #edf2f5;
       color: #35475a;
       font-size: 12px;
       font-weight: 750;
@@ -243,7 +307,7 @@
     }
 
     .match {
-      padding: 14px 16px;
+      padding: 12px 14px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
@@ -265,7 +329,7 @@
       grid-template-columns: minmax(0, 1fr) repeat(6, 32px);
       gap: 7px;
       align-items: center;
-      min-height: 28px;
+      min-height: 30px;
     }
 
     .name {
@@ -289,15 +353,15 @@
       height: 28px;
       display: grid;
       place-items: center;
-      border-radius: 5px;
-      background: #f2f5f8;
+      border-radius: 4px;
+      background: #eef3f1;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
     }
 
     .score.current {
-      background: #f8e7de;
-      color: var(--clay);
+      background: #172531;
+      color: var(--lime);
     }
 
     .meta {
@@ -319,7 +383,9 @@
     .prediction summary {
       cursor: pointer;
       font-weight: 800;
-      color: var(--blue);
+      color: var(--nav);
+      text-transform: uppercase;
+      font-size: 12px;
     }
 
     .h2h-body {
@@ -357,15 +423,15 @@
 
     .prediction-card {
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 10px;
       display: grid;
       gap: 7px;
     }
 
     .bet-card.value {
-      border-color: rgba(22, 120, 79, 0.45);
-      background: #f7fcfa;
+      border-color: rgba(15, 143, 95, 0.62);
+      background: #f5fbf7;
     }
 
     .bet-card.lean {
@@ -376,7 +442,7 @@
     .probability {
       font-size: 26px;
       font-weight: 850;
-      color: var(--green);
+      color: var(--nav);
       font-variant-numeric: tabular-nums;
     }
 
@@ -395,8 +461,8 @@
     .mini-button {
       min-height: 36px;
       border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--ink);
+      border-radius: 6px;
+      background: var(--nav);
       color: white;
       cursor: pointer;
       font-weight: 800;
@@ -416,7 +482,7 @@
 
     .edge-cell {
       border: 1px solid var(--line);
-      border-radius: 7px;
+      border-radius: 5px;
       padding: 7px;
       background: white;
       min-width: 0;
@@ -442,15 +508,15 @@
       align-items: center;
       justify-content: center;
       min-height: 28px;
-      border-radius: 7px;
+      border-radius: 5px;
       font-size: 12px;
       font-weight: 850;
       letter-spacing: 0;
     }
 
     .verdict.value {
-      background: #e8f5ef;
-      color: var(--green);
+      background: var(--green);
+      color: white;
     }
 
     .verdict.lean {
@@ -480,7 +546,7 @@
     .stat {
       background: white;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 14px;
       box-shadow: var(--shadow);
       min-height: 92px;
@@ -510,7 +576,8 @@
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0;
-      background: #fbfcfd;
+      background: #172531;
+      color: #dbe7ec;
     }
 
     tr:last-child td {
@@ -533,7 +600,7 @@
 
     .favorite {
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 12px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -549,7 +616,7 @@
 
     .bet-item {
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 12px;
       display: grid;
       gap: 10px;
@@ -584,9 +651,25 @@
 
     .hidden { display: none; }
 
+    .ticket-summary {
+      border-color: #263846;
+      background: #172531;
+      color: white;
+    }
+
+    .ticket-summary .subtle {
+      color: #a9b8c3;
+    }
+
+    .ticket-summary .pill {
+      background: var(--lime);
+      color: #111b14;
+    }
+
     @media (max-width: 980px) {
       .app { grid-template-columns: 1fr; }
       aside {
+        background: var(--nav);
         position: static;
         height: auto;
         border-right: 0;
@@ -594,6 +677,7 @@
       }
       .grid { grid-template-columns: 1fr; }
       .stat-strip { grid-template-columns: repeat(2, 1fr); }
+      .market-rail { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 620px) {
@@ -601,6 +685,7 @@
       .topbar { align-items: start; flex-direction: column; }
       .topbar h2 { font-size: 23px; }
       .stat-strip { grid-template-columns: 1fr; }
+      .market-rail { grid-template-columns: 1fr; }
       .match { grid-template-columns: 1fr; }
       .meta { justify-items: start; min-width: 0; }
       .player-row { grid-template-columns: minmax(0, 1fr) repeat(6, 28px); }
@@ -618,8 +703,8 @@
       <div class="brand">
         <div class="mark">RG</div>
         <div>
-          <h1>Tenis Dashboard</h1>
-          <p class="subtle">French Open + ATP</p>
+          <h1>Tenis Tip</h1>
+          <p class="subtle">Market board</p>
         </div>
       </div>
 
@@ -631,9 +716,9 @@
       <div class="field">
         <label for="viewFilter">Zobrazení</label>
         <select id="viewFilter">
-          <option value="all">Všechny zápasy</option>
-          <option value="live">Jen živě</option>
-          <option value="favorites">Oblíbení hráči</option>
+          <option value="all">Celý board</option>
+          <option value="live">Live markets</option>
+          <option value="favorites">Watchlist</option>
         </select>
       </div>
 
@@ -668,7 +753,7 @@
       </div>
 
       <p class="footer-note">
-        Bez databáze: stránka se ptá lokálního stahovače, který průběžně čte veřejné zdroje a krátce je drží v paměti.
+        Kurzy zadáváš ručně, value a tiket zůstávají uložené v prohlížeči.
       </p>
     </aside>
 
@@ -676,10 +761,29 @@
       <div class="topbar">
         <div>
           <p class="subtle"><span id="sourceDot" class="status-dot"></span><span id="sourceLabel">Demo data</span></p>
-          <h2>Aktuální stav turnaje</h2>
+          <h2>Tenisový betting board</h2>
         </div>
         <p class="subtle" id="updatedAt">Poslední aktualizace: -</p>
       </div>
+
+      <section class="market-rail" aria-label="Betting souhrn">
+        <div class="market-chip">
+          <span>Bankroll</span>
+          <strong id="bankrollChip">0</strong>
+        </div>
+        <div class="market-chip">
+          <span>Unit</span>
+          <strong id="unitChip">0</strong>
+        </div>
+        <div class="market-chip">
+          <span>Open slip</span>
+          <strong id="openBetsChip">0</strong>
+        </div>
+        <div class="market-chip">
+          <span>Yield</span>
+          <strong id="yieldChip">0%</strong>
+        </div>
+      </section>
 
       <section class="stat-strip" aria-label="Souhrn">
         <div class="stat">
@@ -704,15 +808,15 @@
         <div class="stack">
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">French Open: zápasy</h3>
-              <span class="pill live" id="matchBadge">Live</span>
+              <h3 class="panel-title">Market board</h3>
+              <span class="pill live" id="matchBadge">Markets</span>
             </div>
             <div class="match-list" id="matches"></div>
           </section>
 
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">Výsledky za poslední týden</h3>
+              <h3 class="panel-title">Settled results</h3>
               <span class="pill" id="resultsBadge">7 dní</span>
             </div>
             <div class="match-list" id="results"></div>
@@ -722,7 +826,7 @@
         <div class="stack">
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">ATP Top 10</h3>
+              <h3 class="panel-title">ATP outrights</h3>
               <span class="pill">Singles</span>
             </div>
             <table>
@@ -740,15 +844,15 @@
 
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">Sledovaní hráči</h3>
-              <span class="pill">CZ + favorité</span>
+              <h3 class="panel-title">Watchlist</h3>
+              <span class="pill">CZ + top</span>
             </div>
             <div class="favorite-list" id="favorites"></div>
           </section>
 
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">Bet slip</h3>
+              <h3 class="panel-title">Ticket</h3>
               <span class="pill" id="betsBadge">0 sázek</span>
             </div>
             <div class="bet-list" id="bets"></div>
@@ -792,6 +896,10 @@
       sourceDot: document.getElementById("sourceDot"),
       sourceLabel: document.getElementById("sourceLabel"),
       updatedAt: document.getElementById("updatedAt"),
+      bankrollChip: document.getElementById("bankrollChip"),
+      unitChip: document.getElementById("unitChip"),
+      openBetsChip: document.getElementById("openBetsChip"),
+      yieldChip: document.getElementById("yieldChip"),
       liveCount: document.getElementById("liveCount"),
       doneCount: document.getElementById("doneCount"),
       czCount: document.getElementById("czCount"),
@@ -1082,13 +1190,18 @@
 
     function renderBets() {
       const settled = state.bets.filter((bet) => bet.result !== "open");
+      const open = state.bets.filter((bet) => bet.result === "open");
       const staked = state.bets.reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
       const profit = state.bets.reduce((sum, bet) => sum + betProfit(bet), 0);
       const roi = staked ? (profit / staked) * 100 : 0;
 
+      els.bankrollChip.textContent = money(state.bankroll);
+      els.unitChip.textContent = money(state.unit);
+      els.openBetsChip.textContent = open.length;
+      els.yieldChip.textContent = percentLabel(roi);
       els.betsBadge.textContent = `${state.bets.length} sázek`;
       els.bets.innerHTML = `
-        <div class="favorite">
+        <div class="favorite ticket-summary">
           <div>
             <strong>${signedMoney(profit)}</strong>
             <p class="subtle">P/L · ROI ${percentLabel(roi)} · vyhodnoceno ${settled.length}</p>
