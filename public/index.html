@@ -363,11 +363,104 @@
       gap: 7px;
     }
 
+    .bet-card.value {
+      border-color: rgba(22, 120, 79, 0.45);
+      background: #f7fcfa;
+    }
+
+    .bet-card.lean {
+      border-color: rgba(166, 100, 5, 0.38);
+      background: #fffaf1;
+    }
+
     .probability {
       font-size: 26px;
       font-weight: 850;
       color: var(--green);
       font-variant-numeric: tabular-nums;
+    }
+
+    .odds-row {
+      display: grid;
+      grid-template-columns: minmax(82px, 120px) 1fr;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .odds-row input {
+      padding: 8px 9px;
+      min-height: 36px;
+    }
+
+    .mini-button {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--ink);
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 7px 9px;
+    }
+
+    .mini-button.secondary {
+      background: white;
+      color: var(--ink);
+    }
+
+    .edge-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .edge-cell {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px;
+      background: white;
+      min-width: 0;
+    }
+
+    .edge-cell span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .edge-cell strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .verdict {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .verdict.value {
+      background: #e8f5ef;
+      color: var(--green);
+    }
+
+    .verdict.lean {
+      background: #fff1d8;
+      color: var(--amber);
+    }
+
+    .verdict.skip {
+      background: #eef3f8;
+      color: var(--muted);
     }
 
     .factor-list {
@@ -448,6 +541,40 @@
       align-items: center;
     }
 
+    .bet-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .bet-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .bet-item-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .bet-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .bet-controls input,
+    .bet-controls select {
+      padding: 8px 9px;
+      min-height: 36px;
+    }
+
     .footer-note {
       margin-top: 16px;
       color: var(--muted);
@@ -479,6 +606,8 @@
       .player-row { grid-template-columns: minmax(0, 1fr) repeat(6, 28px); }
       .h2h-row { grid-template-columns: 1fr; gap: 3px; }
       .prediction-grid { grid-template-columns: 1fr; }
+      .edge-grid { grid-template-columns: repeat(2, 1fr); }
+      .bet-controls { grid-template-columns: 1fr 1fr; }
       th, td { padding: 10px 8px; }
     }
   </style>
@@ -521,6 +650,16 @@
       <div class="field">
         <label for="rankingEndpoint">Zdroj ATP</label>
         <input id="rankingEndpoint" readonly value="ESPN / ATP" />
+      </div>
+
+      <div class="field">
+        <label for="bankrollInput">Bankroll</label>
+        <input id="bankrollInput" type="number" min="0" step="100" value="10000" />
+      </div>
+
+      <div class="field">
+        <label for="unitInput">Jednotka</label>
+        <input id="unitInput" type="number" min="1" step="10" value="100" />
       </div>
 
       <div class="button-row">
@@ -606,6 +745,14 @@
             </div>
             <div class="favorite-list" id="favorites"></div>
           </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Bet slip</h3>
+              <span class="pill" id="betsBadge">0 sázek</span>
+            </div>
+            <div class="bet-list" id="bets"></div>
+          </section>
         </div>
       </div>
     </main>
@@ -622,6 +769,10 @@
       liveEndpoint: dashboardApiUrl,
       rankingEndpoint: dashboardApiUrl,
       data: { matches: [], results: [], rankings: [] },
+      bankroll: Number(localStorage.getItem("tennis.bankroll") || 10000),
+      unit: Number(localStorage.getItem("tennis.unit") || 100),
+      odds: JSON.parse(localStorage.getItem("tennis.odds") || "{}"),
+      bets: JSON.parse(localStorage.getItem("tennis.bets") || "[]"),
       usingFallback: false,
       partial: false,
       errors: []
@@ -634,6 +785,8 @@
       searchBox: document.getElementById("searchBox"),
       liveEndpoint: document.getElementById("liveEndpoint"),
       rankingEndpoint: document.getElementById("rankingEndpoint"),
+      bankrollInput: document.getElementById("bankrollInput"),
+      unitInput: document.getElementById("unitInput"),
       refreshBtn: document.getElementById("refreshBtn"),
       saveBtn: document.getElementById("saveBtn"),
       sourceDot: document.getElementById("sourceDot"),
@@ -650,6 +803,10 @@
     };
     els.results = document.getElementById("results");
     els.resultsBadge = document.getElementById("resultsBadge");
+    els.bets = document.getElementById("bets");
+    els.betsBadge = document.getElementById("betsBadge");
+    els.bankrollInput.value = state.bankroll;
+    els.unitInput.value = state.unit;
 
     function normalizePayload(payload, fallbackKey) {
       if (Array.isArray(payload)) return payload;
@@ -682,6 +839,49 @@
     function formatMove(move) {
       if (!move) return "0";
       return move > 0 ? `+${move}` : `${move}`;
+    }
+
+    function money(value) {
+      return Number(value || 0).toLocaleString("cs-CZ", { maximumFractionDigits: 0 });
+    }
+
+    function signedMoney(value) {
+      const number = Number(value || 0);
+      return `${number > 0 ? "+" : ""}${money(number)}`;
+    }
+
+    function percentLabel(value) {
+      if (!Number.isFinite(value)) return "-";
+      return `${Math.round(value * 10) / 10}%`;
+    }
+
+    function matchKey(match) {
+      return (match.players || []).map((player) => player.name).join("::");
+    }
+
+    function oddsKey(match, player) {
+      return `${matchKey(match)}::${player.name}`;
+    }
+
+    function bettingMetrics(probability, odds) {
+      const cleanOdds = Number(odds);
+      if (!cleanOdds || cleanOdds <= 1 || !probability) return null;
+
+      const implied = 1 / cleanOdds;
+      const edge = probability - implied;
+      const fairOdds = 1 / probability;
+      const expectedValue = (probability * cleanOdds) - 1;
+      const kelly = ((cleanOdds * probability) - 1) / (cleanOdds - 1);
+      const halfKellyStake = Math.max(0, kelly * 0.5 * state.bankroll);
+      const cappedStake = Math.min(halfKellyStake, state.unit * 3);
+      const stake = edge > 0 ? Math.max(state.unit, cappedStake || state.unit) : 0;
+      const verdict = edge >= 0.06 ? "VALUE" : edge >= 0.025 ? "LEAN" : "SKIP";
+
+      return { odds: cleanOdds, implied, edge, fairOdds, expectedValue, stake, verdict };
+    }
+
+    function verdictClass(verdict) {
+      return String(verdict || "SKIP").toLowerCase();
     }
 
     function scoreCells(player) {
@@ -733,8 +933,13 @@
         <details class="prediction" open>
           <summary>${label}</summary>
           <div class="prediction-grid">
-            ${players.map((player) => `
-              <div class="prediction-card">
+            ${players.map((player) => {
+              const key = oddsKey(match, player);
+              const odds = state.odds[key] || "";
+              const metrics = bettingMetrics(player.probability, odds);
+              const verdict = metrics?.verdict || "SKIP";
+              return `
+              <div class="prediction-card bet-card ${metrics ? verdictClass(verdict) : ""}">
                 <strong>${player.name}</strong>
                 <span class="probability">${Math.round(player.probability * 100)}%</span>
                 <div class="factor-list">
@@ -743,10 +948,23 @@
                   <span>Antuka: ${player.factors.clayForm}</span>
                   <span>H2H: ${player.factors.h2h}</span>
                 </div>
+                <div class="odds-row">
+                  <div>
+                    <label>Kurz</label>
+                    <input data-odds-key="${key}" type="number" min="1.01" step="0.01" value="${odds}" placeholder="2.10" />
+                  </div>
+                  <button class="mini-button" data-add-bet="${key}" data-player="${player.name}" data-match="${matchKey(match)}" type="button">Do slipu</button>
+                </div>
+                <div class="edge-grid">
+                  <div class="edge-cell"><span>Impl.</span><strong>${metrics ? percentLabel(metrics.implied * 100) : "-"}</strong></div>
+                  <div class="edge-cell"><span>Edge</span><strong>${metrics ? percentLabel(metrics.edge * 100) : "-"}</strong></div>
+                  <div class="edge-cell"><span>Fair</span><strong>${metrics ? metrics.fairOdds.toFixed(2) : "-"}</strong></div>
+                  <div class="edge-cell"><span>Stake</span><strong>${metrics ? money(metrics.stake) : "-"}</strong></div>
+                </div>
+                <span class="verdict ${metrics ? verdictClass(verdict) : "skip"}">${metrics ? verdict : "KURZ"}</span>
               </div>
-            `).join("")}
+            `}).join("")}
           </div>
-          <p class="footer-note">${match.prediction.note}</p>
         </details>
       `;
     }
@@ -855,6 +1073,63 @@
       }).join("");
     }
 
+    function betProfit(bet) {
+      if (bet.result === "win") return bet.stake * (bet.odds - 1);
+      if (bet.result === "loss") return -bet.stake;
+      if (bet.result === "push") return 0;
+      return 0;
+    }
+
+    function renderBets() {
+      const settled = state.bets.filter((bet) => bet.result !== "open");
+      const staked = state.bets.reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
+      const profit = state.bets.reduce((sum, bet) => sum + betProfit(bet), 0);
+      const roi = staked ? (profit / staked) * 100 : 0;
+
+      els.betsBadge.textContent = `${state.bets.length} sázek`;
+      els.bets.innerHTML = `
+        <div class="favorite">
+          <div>
+            <strong>${signedMoney(profit)}</strong>
+            <p class="subtle">P/L · ROI ${percentLabel(roi)} · vyhodnoceno ${settled.length}</p>
+          </div>
+          <span class="pill">${money(staked)}</span>
+        </div>
+        ${state.bets.map((bet) => `
+          <div class="bet-item">
+            <div class="bet-item-head">
+              <div>
+                <strong>${bet.player}</strong>
+                <p class="subtle">${bet.match.replace("::", " vs ")}</p>
+              </div>
+              <span class="pill">${bet.verdict}</span>
+            </div>
+            <div class="bet-controls">
+              <div>
+                <label>Kurz</label>
+                <input data-bet-odds="${bet.id}" type="number" min="1.01" step="0.01" value="${bet.odds}" />
+              </div>
+              <div>
+                <label>Stake</label>
+                <input data-bet-stake="${bet.id}" type="number" min="0" step="10" value="${bet.stake}" />
+              </div>
+              <div>
+                <label>Výsledek</label>
+                <select data-bet-result="${bet.id}">
+                  <option value="open" ${bet.result === "open" ? "selected" : ""}>Open</option>
+                  <option value="win" ${bet.result === "win" ? "selected" : ""}>Win</option>
+                  <option value="loss" ${bet.result === "loss" ? "selected" : ""}>Loss</option>
+                  <option value="push" ${bet.result === "push" ? "selected" : ""}>Push</option>
+                </select>
+              </div>
+              <button class="mini-button secondary" data-remove-bet="${bet.id}" type="button">×</button>
+            </div>
+            <p class="subtle">Edge ${percentLabel(bet.edge * 100)} · fair ${Number(bet.fairOdds).toFixed(2)} · P/L ${signedMoney(betProfit(bet))}</p>
+          </div>
+        `).join("") || `<p class="subtle">Zatím žádný tip ve slipu.</p>`}
+      `;
+    }
+
     function renderStats() {
       const live = state.data.matches.filter((match) => match.status === "live").length;
       const done = (state.data.results || []).length;
@@ -884,6 +1159,7 @@
       renderResults();
       renderRankings();
       renderFavorites();
+      renderBets();
     }
 
     async function refresh() {
@@ -899,8 +1175,55 @@
     }
 
     function saveSettings() {
+      state.bankroll = Number(els.bankrollInput.value) || 0;
+      state.unit = Number(els.unitInput.value) || 1;
       localStorage.setItem("tennis.mode", state.mode);
+      localStorage.setItem("tennis.bankroll", String(state.bankroll));
+      localStorage.setItem("tennis.unit", String(state.unit));
+      localStorage.setItem("tennis.odds", JSON.stringify(state.odds));
+      localStorage.setItem("tennis.bets", JSON.stringify(state.bets));
       refresh();
+    }
+
+    function persistBetting() {
+      localStorage.setItem("tennis.bankroll", String(state.bankroll));
+      localStorage.setItem("tennis.unit", String(state.unit));
+      localStorage.setItem("tennis.odds", JSON.stringify(state.odds));
+      localStorage.setItem("tennis.bets", JSON.stringify(state.bets));
+    }
+
+    function addBet(key, playerName, matchName) {
+      const odds = Number(state.odds[key]);
+      const match = state.data.matches.find((item) => matchKey(item) === matchName);
+      const player = match?.prediction?.players?.find((item) => item.name === playerName);
+      const metrics = bettingMetrics(player?.probability, odds);
+      if (!metrics) return;
+
+      const existing = state.bets.find((bet) => bet.key === key && bet.result === "open");
+      if (existing) {
+        existing.odds = odds;
+        existing.stake = Math.round(metrics.stake);
+        existing.edge = metrics.edge;
+        existing.fairOdds = metrics.fairOdds;
+        existing.verdict = metrics.verdict;
+      } else {
+        state.bets.unshift({
+          id: crypto.randomUUID(),
+          key,
+          match: matchName,
+          player: playerName,
+          odds,
+          stake: Math.round(metrics.stake),
+          edge: metrics.edge,
+          fairOdds: metrics.fairOdds,
+          verdict: metrics.verdict,
+          result: "open",
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      persistBetting();
+      renderBets();
     }
 
     els.demoMode.addEventListener("click", () => {
@@ -915,10 +1238,75 @@
 
     els.refreshBtn.addEventListener("click", refresh);
     els.saveBtn.addEventListener("click", saveSettings);
+    els.bankrollInput.addEventListener("input", () => {
+      state.bankroll = Number(els.bankrollInput.value) || 0;
+      persistBetting();
+      renderMatches();
+      renderBets();
+    });
+    els.unitInput.addEventListener("input", () => {
+      state.unit = Number(els.unitInput.value) || 1;
+      persistBetting();
+      renderMatches();
+      renderBets();
+    });
     els.viewFilter.addEventListener("change", renderMatches);
     els.searchBox.addEventListener("input", () => {
       renderMatches();
       renderResults();
+    });
+
+    document.addEventListener("input", (event) => {
+      const oddsKeyValue = event.target.dataset.oddsKey;
+      if (oddsKeyValue) {
+        state.odds[oddsKeyValue] = event.target.value;
+        persistBetting();
+        return;
+      }
+
+      const betOddsId = event.target.dataset.betOdds;
+      const betStakeId = event.target.dataset.betStake;
+      if (betOddsId || betStakeId) {
+        const bet = state.bets.find((item) => item.id === (betOddsId || betStakeId));
+        if (!bet) return;
+        if (betOddsId) bet.odds = Number(event.target.value) || bet.odds;
+        if (betStakeId) bet.stake = Number(event.target.value) || 0;
+        persistBetting();
+        renderBets();
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      const oddsKeyValue = event.target.dataset.oddsKey;
+      if (oddsKeyValue) {
+        state.odds[oddsKeyValue] = event.target.value;
+        persistBetting();
+        renderMatches();
+        return;
+      }
+
+      const betResultId = event.target.dataset.betResult;
+      if (!betResultId) return;
+      const bet = state.bets.find((item) => item.id === betResultId);
+      if (!bet) return;
+      bet.result = event.target.value;
+      persistBetting();
+      renderBets();
+    });
+
+    document.addEventListener("click", (event) => {
+      const addKey = event.target.dataset.addBet;
+      if (addKey) {
+        addBet(addKey, event.target.dataset.player, event.target.dataset.match);
+        return;
+      }
+
+      const removeId = event.target.dataset.removeBet;
+      if (removeId) {
+        state.bets = state.bets.filter((bet) => bet.id !== removeId);
+        persistBetting();
+        renderBets();
+      }
     });
 
     refresh();
