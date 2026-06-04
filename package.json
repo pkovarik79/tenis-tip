@@ -1,0 +1,17 @@
+{
+  "name": "tennis-live-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lokální tenisový dashboard pro French Open, ATP ranking, H2H a testovací predikce.",
+  "scripts": {
+    "start": "node server.js",
+    "cf:check": "wrangler deploy --dry-run",
+    "cf:deploy": "wrangler deploy"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "wrangler": "^4.98.0"
+  }
+}

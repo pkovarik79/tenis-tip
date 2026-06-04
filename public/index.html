@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tenis Live Dashboard</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #637083;
+      --line: #d8e0e8;
+      --page: #f6f8fb;
+      --panel: #ffffff;
+      --green: #16784f;
+      --clay: #bb5837;
+      --blue: #245f9f;
+      --amber: #a66405;
+      --shadow: 0 10px 28px rgba(29, 46, 65, 0.09);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+    }
+
+    aside {
+      background: #fdfdfd;
+      border-right: 1px solid var(--line);
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    main {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--clay);
+      color: white;
+      font-weight: 800;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 6px;
+      padding: 10px 11px;
+      color: var(--ink);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+      margin-bottom: 18px;
+    }
+
+    .segmented button {
+      border: 0;
+      background: transparent;
+      padding: 10px 8px;
+      cursor: pointer;
+      color: var(--muted);
+      min-height: 40px;
+    }
+
+    .segmented button.active {
+      background: var(--ink);
+      color: white;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+      display: inline-block;
+      margin-right: 7px;
+    }
+
+    .status-dot.live {
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(22, 120, 79, 0.12);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .topbar h2 {
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 16px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef3f8;
+      color: #35475a;
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .pill.live {
+      background: #e8f5ef;
+      color: var(--green);
+    }
+
+    .match-list {
+      display: grid;
+    }
+
+    .match {
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .match:last-child {
+      border-bottom: 0;
+    }
+
+    .players {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(6, 32px);
+      gap: 7px;
+      align-items: center;
+      min-height: 28px;
+    }
+
+    .name {
+      font-weight: 750;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .name.winner {
+      color: var(--green);
+    }
+
+    .seed {
+      color: var(--muted);
+      font-weight: 650;
+      margin-left: 5px;
+    }
+
+    .score {
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 5px;
+      background: #f2f5f8;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score.current {
+      background: #f8e7de;
+      color: var(--clay);
+    }
+
+    .meta {
+      min-width: 142px;
+      display: grid;
+      justify-items: end;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .h2h {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .h2h summary,
+    .prediction summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue);
+    }
+
+    .h2h-body {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .h2h-record {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .h2h-row {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .prediction {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .prediction-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .prediction-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .probability {
+      font-size: 26px;
+      font-weight: 850;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .factor-list {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      min-height: 92px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      margin-top: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      background: #fbfcfd;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .rank {
+      font-weight: 850;
+      width: 52px;
+    }
+
+    .move.up { color: var(--green); }
+    .move.down { color: #b53c31; }
+
+    .favorite-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .favorite {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      aside {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .grid { grid-template-columns: 1fr; }
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 620px) {
+      main { padding: 14px; }
+      .topbar { align-items: start; flex-direction: column; }
+      .topbar h2 { font-size: 23px; }
+      .stat-strip { grid-template-columns: 1fr; }
+      .match { grid-template-columns: 1fr; }
+      .meta { justify-items: start; min-width: 0; }
+      .player-row { grid-template-columns: minmax(0, 1fr) repeat(6, 28px); }
+      .h2h-row { grid-template-columns: 1fr; gap: 3px; }
+      .prediction-grid { grid-template-columns: 1fr; }
+      th, td { padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="mark">RG</div>
+        <div>
+          <h1>Tenis Dashboard</h1>
+          <p class="subtle">French Open + ATP</p>
+        </div>
+      </div>
+
+      <div class="segmented" role="tablist" aria-label="Datový režim">
+        <button id="apiMode" class="active" type="button">Reálná data</button>
+        <button id="demoMode" type="button">Vypnuto</button>
+      </div>
+
+      <div class="field">
+        <label for="viewFilter">Zobrazení</label>
+        <select id="viewFilter">
+          <option value="all">Všechny zápasy</option>
+          <option value="live">Jen živě</option>
+          <option value="favorites">Oblíbení hráči</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="searchBox">Hráč</label>
+        <input id="searchBox" placeholder="Alcaraz, Lehečka..." />
+      </div>
+
+      <div class="field">
+        <label for="liveEndpoint">Zdroj zápasů</label>
+        <input id="liveEndpoint" readonly value="Roland-Garros" />
+      </div>
+
+      <div class="field">
+        <label for="rankingEndpoint">Zdroj ATP</label>
+        <input id="rankingEndpoint" readonly value="ESPN / ATP" />
+      </div>
+
+      <div class="button-row">
+        <button class="primary" id="refreshBtn" type="button">Obnovit</button>
+        <button class="icon-button" id="saveBtn" type="button" title="Uložit nastavení" aria-label="Uložit nastavení">✓</button>
+      </div>
+
+      <p class="footer-note">
+        Bez databáze: stránka se ptá lokálního stahovače, který průběžně čte veřejné zdroje a krátce je drží v paměti.
+      </p>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div>
+          <p class="subtle"><span id="sourceDot" class="status-dot"></span><span id="sourceLabel">Demo data</span></p>
+          <h2>Aktuální stav turnaje</h2>
+        </div>
+        <p class="subtle" id="updatedAt">Poslední aktualizace: -</p>
+      </div>
+
+      <section class="stat-strip" aria-label="Souhrn">
+        <div class="stat">
+          <p class="subtle">Živé zápasy</p>
+          <strong id="liveCount">0</strong>
+        </div>
+        <div class="stat">
+          <p class="subtle">Výsledky 7 dní</p>
+          <strong id="doneCount">0</strong>
+        </div>
+        <div class="stat">
+          <p class="subtle">Češi ve výběru</p>
+          <strong id="czCount">0</strong>
+        </div>
+        <div class="stat">
+          <p class="subtle">ATP lídr</p>
+          <strong id="leaderName">-</strong>
+        </div>
+      </section>
+
+      <div class="grid">
+        <div class="stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">French Open: zápasy</h3>
+              <span class="pill live" id="matchBadge">Live</span>
+            </div>
+            <div class="match-list" id="matches"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Výsledky za poslední týden</h3>
+              <span class="pill" id="resultsBadge">7 dní</span>
+            </div>
+            <div class="match-list" id="results"></div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">ATP Top 10</h3>
+              <span class="pill">Singles</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Hráč</th>
+                  <th>Body</th>
+                  <th>Posun</th>
+                </tr>
+              </thead>
+              <tbody id="rankings"></tbody>
+            </table>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Sledovaní hráči</h3>
+              <span class="pill">CZ + favorité</span>
+            </div>
+            <div class="favorite-list" id="favorites"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const favorites = ["Jiri Lehecka", "Jakub Mensik", "Tomas Machac", "Carlos Alcaraz", "Jannik Sinner"];
+    const dashboardApiUrl = window.location.protocol === "file:"
+      ? "http://127.0.0.1:4173/api/dashboard"
+      : "/api/dashboard";
+
+    let state = {
+      mode: "api",
+      liveEndpoint: dashboardApiUrl,
+      rankingEndpoint: dashboardApiUrl,
+      data: { matches: [], results: [], rankings: [] },
+      usingFallback: false,
+      partial: false,
+      errors: []
+    };
+
+    const els = {
+      demoMode: document.getElementById("demoMode"),
+      apiMode: document.getElementById("apiMode"),
+      viewFilter: document.getElementById("viewFilter"),
+      searchBox: document.getElementById("searchBox"),
+      liveEndpoint: document.getElementById("liveEndpoint"),
+      rankingEndpoint: document.getElementById("rankingEndpoint"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      sourceDot: document.getElementById("sourceDot"),
+      sourceLabel: document.getElementById("sourceLabel"),
+      updatedAt: document.getElementById("updatedAt"),
+      liveCount: document.getElementById("liveCount"),
+      doneCount: document.getElementById("doneCount"),
+      czCount: document.getElementById("czCount"),
+      leaderName: document.getElementById("leaderName"),
+      matches: document.getElementById("matches"),
+      rankings: document.getElementById("rankings"),
+      favorites: document.getElementById("favorites"),
+      matchBadge: document.getElementById("matchBadge")
+    };
+    els.results = document.getElementById("results");
+    els.resultsBadge = document.getElementById("resultsBadge");
+
+    function normalizePayload(payload, fallbackKey) {
+      if (Array.isArray(payload)) return payload;
+      if (Array.isArray(payload[fallbackKey])) return payload[fallbackKey];
+      if (Array.isArray(payload.data)) return payload.data;
+      if (payload.data && Array.isArray(payload.data[fallbackKey])) return payload.data[fallbackKey];
+      return [];
+    }
+
+    async function loadApiData() {
+      const response = await fetch(dashboardApiUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("Data source failed");
+      const payload = await response.json();
+      state.data = {
+        matches: normalizePayload(payload, "matches"),
+        results: normalizePayload(payload, "results"),
+        rankings: normalizePayload(payload, "rankings")
+      };
+      state.usingFallback = Boolean(payload.usingFallback);
+      state.partial = Boolean(payload.partial);
+      state.errors = payload.errors || [];
+    }
+
+    function statusLabel(match) {
+      if (match.status === "live") return "Živě";
+      if (match.status === "finished") return "Hotovo";
+      return match.start || "Program";
+    }
+
+    function formatMove(move) {
+      if (!move) return "0";
+      return move > 0 ? `+${move}` : `${move}`;
+    }
+
+    function scoreCells(player) {
+      const resultMode = player.sets && player.sets.length > 0 && player.game === "";
+      const indexes = resultMode ? [0, 1, 2, 3, 4] : [0, 1, 2];
+      const setCells = indexes.map((index) => {
+        const value = player.sets && player.sets[index] !== undefined ? player.sets[index] : "-";
+        return `<span class="score">${value}</span>`;
+      }).join("");
+      if (resultMode) return `${setCells}<span class="score current">-</span>`;
+      const game = player.game !== undefined && player.game !== "" ? player.game : "-";
+      return `${setCells}<span class="score current">${game}</span>`;
+    }
+
+    function h2hBlock(match) {
+      if (!match.h2h) return "";
+      const h2h = match.h2h;
+      const [first, second] = h2h.players || [];
+      const title = h2h.total
+        ? `H2H: ${first.name} ${first.wins}-${second.wins} ${second.name}`
+        : "H2H: zatím bez vzájemného zápasu";
+      const rows = (h2h.meetings || []).map((meeting) => `
+        <div class="h2h-row">
+          <span>${dateLabel(meeting.date)}</span>
+          <span>${meeting.tournament} · ${meeting.surface || "-"} · ${meeting.round || "-"}</span>
+          <span><strong>${meeting.winner}</strong> ${meeting.score}</span>
+        </div>
+      `).join("");
+
+      return `
+        <details class="h2h">
+          <summary>${title}</summary>
+          <div class="h2h-body">
+            <div class="h2h-record">${h2h.total} vzájemných zápasů v databázi</div>
+            ${rows || `<p class="subtle">V historických datech nebyl nalezen žádný vzájemný zápas.</p>`}
+          </div>
+        </details>
+      `;
+    }
+
+    function predictionBlock(match) {
+      if (!match.prediction) return "";
+      const players = match.prediction.players || [];
+      const label = players.length === 2
+        ? `Predikce: ${players[0].name} ${Math.round(players[0].probability * 100)}% · ${players[1].name} ${Math.round(players[1].probability * 100)}%`
+        : "Predikce";
+
+      return `
+        <details class="prediction" open>
+          <summary>${label}</summary>
+          <div class="prediction-grid">
+            ${players.map((player) => `
+              <div class="prediction-card">
+                <strong>${player.name}</strong>
+                <span class="probability">${Math.round(player.probability * 100)}%</span>
+                <div class="factor-list">
+                  <span>Ranking: ${player.factors.ranking}</span>
+                  <span>Forma: ${player.factors.recentForm}</span>
+                  <span>Antuka: ${player.factors.clayForm}</span>
+                  <span>H2H: ${player.factors.h2h}</span>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+          <p class="footer-note">${match.prediction.note}</p>
+        </details>
+      `;
+    }
+
+    function renderMatches() {
+      const query = els.searchBox.value.trim().toLowerCase();
+      const filter = els.viewFilter.value;
+
+      const matches = state.data.matches.filter((match) => {
+        const names = match.players.map((p) => p.name.toLowerCase()).join(" ");
+        const isFavorite = favorites.some((name) => names.includes(name.toLowerCase()));
+        if (query && !names.includes(query)) return false;
+        if (filter === "live" && match.status !== "live") return false;
+        if (filter === "favorites" && !isFavorite) return false;
+        return true;
+      });
+
+      els.matchBadge.textContent = `${matches.length} zápasů`;
+
+      els.matches.innerHTML = matches.map((match) => `
+        <article class="match">
+          <div class="players">
+            ${match.players.map((player) => `
+              <div class="player-row">
+                <span class="name ${player.winner ? "winner" : ""}">${player.name}${player.seed ? `<span class="seed">(${player.seed})</span>` : ""}</span>
+                ${scoreCells(player)}
+              </div>
+            `).join("")}
+          </div>
+          <div class="meta">
+            <span class="pill ${match.status === "live" ? "live" : ""}">${statusLabel(match)}</span>
+            <span>${match.round}</span>
+            <span>${match.court}</span>
+            ${match.server ? `<span>Podává: ${match.server}</span>` : ""}
+          </div>
+          ${predictionBlock(match)}
+          ${h2hBlock(match)}
+        </article>
+      `).join("") || `<article class="match"><p class="subtle">Žádné zápasy pro aktuální filtr.</p></article>`;
+    }
+
+    function dateLabel(date) {
+      return new Date(`${date}T12:00:00`).toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric" });
+    }
+
+    function durationLabel(minutes) {
+      if (!minutes) return "";
+      const hours = Math.floor(minutes / 60);
+      const mins = String(minutes % 60).padStart(2, "0");
+      return `${hours}h${mins}`;
+    }
+
+    function renderResults() {
+      const query = els.searchBox.value.trim().toLowerCase();
+      const results = (state.data.results || []).filter((match) => {
+        const names = match.players.map((p) => p.name.toLowerCase()).join(" ");
+        if (query && !names.includes(query)) return false;
+        return true;
+      });
+
+      els.resultsBadge.textContent = `${results.length} výsledků`;
+      els.results.innerHTML = results.slice(0, 40).map((match) => `
+        <article class="match">
+          <div class="players">
+            ${match.players.map((player) => `
+              <div class="player-row">
+                <span class="name ${player.winner ? "winner" : ""}">${player.name}${player.seed ? `<span class="seed">(${player.seed})</span>` : ""}</span>
+                ${scoreCells(player)}
+              </div>
+            `).join("")}
+          </div>
+          <div class="meta">
+            <span class="pill">${dateLabel(match.date)}</span>
+            <span>${match.round}</span>
+            <span>${match.court}</span>
+            ${match.duration ? `<span>${durationLabel(match.duration)}</span>` : ""}
+          </div>
+        </article>
+      `).join("") || `<article class="match"><p class="subtle">Za poslední týden nejsou ve zdroji žádné dokončené singlové zápasy.</p></article>`;
+    }
+
+    function renderRankings() {
+      els.rankings.innerHTML = state.data.rankings.slice(0, 10).map((row) => `
+        <tr>
+          <td class="rank">${row.rank}</td>
+          <td>${row.player}</td>
+          <td>${Number(row.points || 0).toLocaleString("cs-CZ")}</td>
+          <td class="move ${row.move > 0 ? "up" : row.move < 0 ? "down" : ""}">${formatMove(row.move)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderFavorites() {
+      els.favorites.innerHTML = favorites.map((name) => {
+        const ranking = state.data.rankings.find((row) => row.player.toLowerCase() === name.toLowerCase());
+        const match = state.data.matches.find((item) => item.players.some((player) => player.name.toLowerCase() === name.toLowerCase()));
+        return `
+          <div class="favorite">
+            <div>
+              <strong>${name}</strong>
+              <p class="subtle">${match ? `${statusLabel(match)} · ${match.court}` : "Bez dnešního zápasu"}</p>
+            </div>
+            <span class="pill">${ranking ? `#${ranking.rank}` : "-"}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderStats() {
+      const live = state.data.matches.filter((match) => match.status === "live").length;
+      const done = (state.data.results || []).length;
+      const cz = state.data.matches.filter((match) => match.players.some((player) => favorites.slice(0, 3).includes(player.name))).length;
+      const leader = state.data.rankings[0];
+
+      els.liveCount.textContent = live;
+      els.doneCount.textContent = done;
+      els.czCount.textContent = cz;
+      els.leaderName.textContent = leader ? leader.player.split(" ").at(-1) : "-";
+      els.sourceDot.classList.toggle("live", !state.partial && !state.errors.length);
+      els.sourceLabel.textContent = state.errors.length
+        ? `Zdroj částečně nedostupný: ${state.errors.join("; ")}`
+        : "Napojeno na reálné zdroje";
+      els.updatedAt.textContent = `Poslední aktualizace: ${new Date().toLocaleString("cs-CZ")}`;
+    }
+
+    function renderMode() {
+      els.demoMode.classList.toggle("active", state.mode === "demo");
+      els.apiMode.classList.toggle("active", state.mode === "api");
+    }
+
+    function render() {
+      renderMode();
+      renderStats();
+      renderMatches();
+      renderResults();
+      renderRankings();
+      renderFavorites();
+    }
+
+    async function refresh() {
+      try {
+        await loadApiData();
+      } catch (error) {
+        state.data = { matches: [], results: [], rankings: [] };
+        state.errors = [`Lokální stahovač je nedostupný: ${error.message}`];
+        state.partial = true;
+      }
+
+      render();
+    }
+
+    function saveSettings() {
+      localStorage.setItem("tennis.mode", state.mode);
+      refresh();
+    }
+
+    els.demoMode.addEventListener("click", () => {
+      state.mode = "api";
+      refresh();
+    });
+
+    els.apiMode.addEventListener("click", () => {
+      state.mode = "api";
+      refresh();
+    });
+
+    els.refreshBtn.addEventListener("click", refresh);
+    els.saveBtn.addEventListener("click", saveSettings);
+    els.viewFilter.addEventListener("change", renderMatches);
+    els.searchBox.addEventListener("input", () => {
+      renderMatches();
+      renderResults();
+    });
+
+    refresh();
+    window.setInterval(refresh, 30000);
+  </script>
+</body>
+</html>
