@@ -551,6 +551,35 @@
       font-size: 12px;
     }
 
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .model-stat {
+      border: 1px solid #4d4d58;
+      border-radius: 4px;
+      background: #24242b;
+      padding: 7px;
+      min-width: 0;
+    }
+
+    .model-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .model-stat strong {
+      display: block;
+      margin-top: 2px;
+      color: white;
+      font-size: 13px;
+    }
+
     .stat-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -707,6 +736,7 @@
       .player-row { grid-template-columns: minmax(0, 1fr) repeat(6, 28px); }
       .h2h-row { grid-template-columns: 1fr; gap: 3px; }
       .prediction-grid { grid-template-columns: 1fr; }
+      .model-grid { grid-template-columns: repeat(2, 1fr); }
       .edge-grid { grid-template-columns: repeat(2, 1fr); }
       .bet-controls { grid-template-columns: 1fr 1fr; }
       th, td { padding: 10px 8px; }
@@ -749,8 +779,8 @@
       </div>
 
       <div class="field">
-        <label for="rankingEndpoint">Zdroj ATP</label>
-        <input id="rankingEndpoint" readonly value="ESPN / ATP" />
+        <label for="rankingEndpoint">Zdroj rankingů</label>
+        <input id="rankingEndpoint" readonly value="ESPN + model" />
       </div>
 
       <div class="field">
@@ -815,7 +845,7 @@
           <strong id="czCount">0</strong>
         </div>
         <div class="stat">
-          <p class="subtle">ATP lídr</p>
+          <p class="subtle">Ranking lídr</p>
           <strong id="leaderName">-</strong>
         </div>
       </section>
@@ -842,15 +872,15 @@
         <div class="stack">
           <section class="panel">
             <div class="panel-head">
-              <h3 class="panel-title">ATP outrights</h3>
-              <span class="pill">Singles</span>
+              <h3 class="panel-title">Ranking board</h3>
+              <span class="pill">ATP/WTA</span>
             </div>
             <table>
               <thead>
                 <tr>
                   <th>#</th>
                   <th>Hráč</th>
-                  <th>Body</th>
+                  <th>Tour</th>
                   <th>Posun</th>
                 </tr>
               </thead>
@@ -979,6 +1009,11 @@
       return `${Math.round(value * 10) / 10}%`;
     }
 
+    function probabilityLabel(value) {
+      if (!Number.isFinite(value)) return "-";
+      return `${Math.round(value * 100)}%`;
+    }
+
     function matchKey(match) {
       return (match.players || []).map((player) => player.name).join("::");
     }
@@ -1050,7 +1085,7 @@
       if (!match.prediction) return "";
       const players = match.prediction.players || [];
       const label = players.length === 2
-        ? `Predikce: ${players[0].name} ${Math.round(players[0].probability * 100)}% · ${players[1].name} ${Math.round(players[1].probability * 100)}%`
+        ? `Model ${probabilityLabel(match.prediction.confidence)}: ${players[0].name} ${probabilityLabel(players[0].probability)} · ${players[1].name} ${probabilityLabel(players[1].probability)}`
         : "Predikce";
 
       return `
@@ -1065,9 +1100,18 @@
               return `
               <div class="prediction-card bet-card ${metrics ? verdictClass(verdict) : ""}">
                 <strong>${player.name}</strong>
-                <span class="probability">${Math.round(player.probability * 100)}%</span>
+                <span class="probability">${probabilityLabel(player.probability)}</span>
+                <div class="model-grid">
+                  <div class="model-stat"><span>Rank</span><strong>${player.rank ? `#${player.rank}` : "-"}</strong></div>
+                  <div class="model-stat"><span>Last 5</span><strong>${player.stats?.lastFive || "-"}</strong></div>
+                  <div class="model-stat"><span>Recent</span><strong>${player.stats?.recent || "-"}</strong></div>
+                  <div class="model-stat"><span>Clay</span><strong>${player.stats?.clay || "-"}</strong></div>
+                  <div class="model-stat"><span>Clay 10</span><strong>${player.stats?.clayRecent || "-"}</strong></div>
+                  <div class="model-stat"><span>Sample</span><strong>${player.stats?.totalMatches || 0}</strong></div>
+                </div>
                 <div class="factor-list">
                   <span>Ranking: ${player.factors.ranking}</span>
+                  <span>Last 5: ${player.factors.lastFive}</span>
                   <span>Forma: ${player.factors.recentForm}</span>
                   <span>Antuka: ${player.factors.clayForm}</span>
                   <span>H2H: ${player.factors.h2h}</span>
@@ -1175,7 +1219,7 @@
         <tr>
           <td class="rank">${row.rank}</td>
           <td>${row.player}</td>
-          <td>${Number(row.points || 0).toLocaleString("cs-CZ")}</td>
+          <td>${row.tour || (row.points ? Number(row.points).toLocaleString("cs-CZ") : "-")}</td>
           <td class="move ${row.move > 0 ? "up" : row.move < 0 ? "down" : ""}">${formatMove(row.move)}</td>
         </tr>
       `).join("");
