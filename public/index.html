@@ -6,20 +6,22 @@
   <title>Tenis Live Dashboard</title>
   <style>
     :root {
-      --ink: #17212b;
-      --muted: #6d7785;
-      --line: #d4dbe2;
-      --page: #eef2f0;
-      --panel: #ffffff;
-      --green: #0f8f5f;
-      --lime: #9bd43a;
-      --clay: #b84d32;
-      --blue: #1d5f85;
-      --amber: #b56c00;
-      --red: #b9322b;
-      --nav: #101820;
-      --nav-soft: #172531;
-      --shadow: 0 8px 22px rgba(20, 32, 42, 0.08);
+      --ink: #f5f6f8;
+      --muted: #b9bbc6;
+      --line: #444650;
+      --page: #15151a;
+      --panel: #2d2d36;
+      --green: #00a86b;
+      --lime: #ffd800;
+      --clay: #db6a43;
+      --blue: #8aa5ff;
+      --amber: #ffbf34;
+      --red: #ff5b57;
+      --nav: #121217;
+      --nav-soft: #24242c;
+      --odd: #3a3a44;
+      --odd-hover: #474752;
+      --shadow: none;
     }
 
     * { box-sizing: border-box; }
@@ -55,6 +57,7 @@
     main {
       padding: 22px;
       min-width: 0;
+      background: #17171d;
     }
 
     .brand {
@@ -71,7 +74,7 @@
       place-items: center;
       border-radius: 8px;
       background: var(--lime);
-      color: #122015;
+      color: #111;
       font-weight: 800;
       box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
     }
@@ -123,10 +126,10 @@
     input, select {
       width: 100%;
       border: 1px solid var(--line);
-      background: white;
+      background: #1d1d24;
       border-radius: 6px;
       padding: 10px 11px;
-      color: var(--ink);
+      color: white;
     }
 
     aside input,
@@ -157,7 +160,7 @@
 
     .segmented button.active {
       background: var(--lime);
-      color: #111b14;
+      color: #111;
     }
 
     .button-row {
@@ -183,8 +186,8 @@
       min-height: 42px;
       border: 0;
       border-radius: 8px;
-      background: var(--green);
-      color: white;
+      background: var(--lime);
+      color: #111;
       font-weight: 750;
       cursor: pointer;
     }
@@ -222,17 +225,17 @@
       gap: 8px;
       margin-bottom: 18px;
       padding: 8px;
-      border: 1px solid #cbd6dc;
-      border-radius: 8px;
-      background: #172531;
+      border: 1px solid #373740;
+      border-radius: 4px;
+      background: #24242c;
       color: white;
     }
 
     .market-chip {
       min-height: 58px;
       padding: 10px 12px;
-      border-radius: 6px;
-      background: #0c141b;
+      border-radius: 4px;
+      background: #111116;
       display: grid;
       gap: 3px;
     }
@@ -264,7 +267,7 @@
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 4px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -274,7 +277,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #45454f;
+      background: #34343d;
       gap: 12px;
     }
 
@@ -289,17 +293,17 @@
       align-items: center;
       min-height: 26px;
       padding: 4px 8px;
-      border-radius: 6px;
-      background: #edf2f5;
-      color: #35475a;
+      border-radius: 4px;
+      background: #464650;
+      color: #e8e8ef;
       font-size: 12px;
       font-weight: 750;
       white-space: nowrap;
     }
 
     .pill.live {
-      background: #e8f5ef;
-      color: var(--green);
+      background: var(--lime);
+      color: #111;
     }
 
     .match-list {
@@ -311,7 +315,16 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #404049;
+      background: #2f2f38;
+    }
+
+    .match:nth-child(even) {
+      background: #292932;
+    }
+
+    .match:hover {
+      background: #34343f;
     }
 
     .match:last-child {
@@ -340,7 +353,7 @@
     }
 
     .name.winner {
-      color: var(--green);
+      color: var(--lime);
     }
 
     .seed {
@@ -354,13 +367,14 @@
       display: grid;
       place-items: center;
       border-radius: 4px;
-      background: #eef3f1;
+      background: #3b3b45;
+      color: #f5f6f8;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
     }
 
     .score.current {
-      background: #172531;
+      background: #111116;
       color: var(--lime);
     }
 
@@ -383,7 +397,7 @@
     .prediction summary {
       cursor: pointer;
       font-weight: 800;
-      color: var(--nav);
+      color: var(--lime);
       text-transform: uppercase;
       font-size: 12px;
     }
@@ -422,27 +436,28 @@
     }
 
     .prediction-card {
-      border: 1px solid var(--line);
-      border-radius: 6px;
+      border: 1px solid #4a4a55;
+      border-radius: 4px;
       padding: 10px;
       display: grid;
       gap: 7px;
+      background: var(--odd);
     }
 
     .bet-card.value {
-      border-color: rgba(15, 143, 95, 0.62);
-      background: #f5fbf7;
+      border-color: var(--lime);
+      background: #3b3b24;
     }
 
     .bet-card.lean {
-      border-color: rgba(166, 100, 5, 0.38);
-      background: #fffaf1;
+      border-color: var(--amber);
+      background: #3b3328;
     }
 
     .probability {
       font-size: 26px;
       font-weight: 850;
-      color: var(--nav);
+      color: white;
       font-variant-numeric: tabular-nums;
     }
 
@@ -462,16 +477,16 @@
       min-height: 36px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: var(--nav);
-      color: white;
+      background: var(--lime);
+      color: #111;
       cursor: pointer;
       font-weight: 800;
       padding: 7px 9px;
     }
 
     .mini-button.secondary {
-      background: white;
-      color: var(--ink);
+      background: #3b3b45;
+      color: white;
     }
 
     .edge-grid {
@@ -481,10 +496,10 @@
     }
 
     .edge-cell {
-      border: 1px solid var(--line);
+      border: 1px solid #4d4d58;
       border-radius: 5px;
       padding: 7px;
-      background: white;
+      background: #24242b;
       min-width: 0;
     }
 
@@ -520,12 +535,12 @@
     }
 
     .verdict.lean {
-      background: #fff1d8;
-      color: var(--amber);
+      background: var(--amber);
+      color: #111;
     }
 
     .verdict.skip {
-      background: #eef3f8;
+      background: #464650;
       color: var(--muted);
     }
 
@@ -544,7 +559,7 @@
     }
 
     .stat {
-      background: white;
+      background: #2d2d36;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 14px;
@@ -567,17 +582,16 @@
     th, td {
       padding: 11px 12px;
       text-align: left;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #44444d;
       font-size: 14px;
     }
 
     th {
-      color: var(--muted);
+      color: #dfe1ea;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0;
-      background: #172531;
-      color: #dbe7ec;
+      background: #202028;
     }
 
     tr:last-child td {
@@ -590,7 +604,7 @@
     }
 
     .move.up { color: var(--green); }
-    .move.down { color: #b53c31; }
+    .move.down { color: var(--red); }
 
     .favorite-list {
       display: grid;
@@ -599,13 +613,14 @@
     }
 
     .favorite {
-      border: 1px solid var(--line);
-      border-radius: 6px;
+      border: 1px solid #44444d;
+      border-radius: 4px;
       padding: 12px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px;
       align-items: center;
+      background: #303039;
     }
 
     .bet-list {
@@ -615,11 +630,12 @@
     }
 
     .bet-item {
-      border: 1px solid var(--line);
-      border-radius: 6px;
+      border: 1px solid #44444d;
+      border-radius: 4px;
       padding: 12px;
       display: grid;
       gap: 10px;
+      background: #303039;
     }
 
     .bet-item-head {
@@ -652,8 +668,8 @@
     .hidden { display: none; }
 
     .ticket-summary {
-      border-color: #263846;
-      background: #172531;
+      border-color: #4d4d58;
+      background: #111116;
       color: white;
     }
 
@@ -663,7 +679,7 @@
 
     .ticket-summary .pill {
       background: var(--lime);
-      color: #111b14;
+      color: #111;
     }
 
     @media (max-width: 980px) {

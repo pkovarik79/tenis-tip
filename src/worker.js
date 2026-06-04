@@ -373,6 +373,41 @@ function parseRolandGarrosMatches(html) {
   }));
 }
 
+function fallbackRolandGarrosMatches(date) {
+  if (date !== "2026-06-04") return [];
+
+  return [
+    {
+      tournament: "Roland-Garros",
+      event: "Women’s Singles",
+      court: "Court Philippe-Chatrier",
+      round: "Semifinále",
+      status: "scheduled",
+      start: "15:00",
+      server: "",
+      source: "AS order of play fallback",
+      players: [
+        { name: "Marta Kostyuk", seed: "15", ranking: null, sets: [], game: "", winner: false },
+        { name: "Mirra Andreeva", seed: "8", ranking: null, sets: [], game: "", winner: false }
+      ]
+    },
+    {
+      tournament: "Roland-Garros",
+      event: "Women’s Singles",
+      court: "Court Philippe-Chatrier",
+      round: "Semifinále",
+      status: "scheduled",
+      start: "Po prvním semifinále",
+      server: "",
+      source: "AS order of play fallback",
+      players: [
+        { name: "Diana Shnaider", seed: "25", ranking: null, sets: [], game: "", winner: false },
+        { name: "Maja Chwalinska", seed: null, ranking: null, sets: [], game: "", winner: false }
+      ]
+    }
+  ];
+}
+
 function parseRolandGarrosResults(html, date) {
   const page = extractRolandGarrosPage(html);
   const matches = allRolandGarrosMatches(page);
@@ -437,12 +472,14 @@ async function loadDashboardData() {
   }
 
   try {
+    const today = dateIso(new Date());
     const rgMatches = parseRolandGarrosMatches(
-      await fetchText(rolandGarrosUrl(dateIso(new Date())))
+      await fetchText(rolandGarrosUrl(today))
     );
-    if (!rgMatches.length) throw new Error("no Roland-Garros singles matches found");
-    matches = await attachH2H(rgMatches);
-    sources.push("Roland-Garros order of play");
+    const currentMatches = rgMatches.length ? rgMatches : fallbackRolandGarrosMatches(today);
+    if (!currentMatches.length) throw new Error("no Roland-Garros singles matches found");
+    matches = await attachH2H(currentMatches);
+    sources.push(rgMatches.length ? "Roland-Garros order of play" : "AS order of play fallback");
     sources.push("Jeff Sackmann Tennis Abstract H2H");
   } catch (error) {
     errors.push(`Roland-Garros order of play: ${error.message}`);
