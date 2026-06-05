@@ -5,8 +5,8 @@
   "description": "Lokální tenisový dashboard pro French Open, ATP ranking, H2H a testovací predikce.",
   "scripts": {
     "start": "node server.js",
-    "cf:check": "wrangler deploy --dry-run",
-    "cf:deploy": "wrangler deploy"
+    "cf:check": "node node_modules/wrangler/bin/wrangler.js deploy --dry-run",
+    "cf:deploy": "node node_modules/wrangler/bin/wrangler.js deploy"
   },
   "engines": {
     "node": ">=18"

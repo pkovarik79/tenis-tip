@@ -914,15 +914,110 @@
       ? "http://127.0.0.1:4173/api/dashboard"
       : "/api/dashboard";
 
+    function storedJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : fallback;
+      } catch {
+        localStorage.removeItem(key);
+        return fallback;
+      }
+    }
+
+    function storedNumber(key, fallback) {
+      const value = Number(localStorage.getItem(key));
+      return Number.isFinite(value) && value > 0 ? value : fallback;
+    }
+
+    function clientFallbackData() {
+      return {
+        matches: [
+          {
+            tournament: "Roland-Garros",
+            event: "Men’s Singles",
+            court: "Court Philippe-Chatrier",
+            round: "Semifinále",
+            status: "scheduled",
+            start: "Dnes",
+            players: [
+              { name: "Alexander Zverev", seed: "2", ranking: 3, sets: [], game: "", winner: false },
+              { name: "Jakub Mensik", seed: null, ranking: 12, sets: [], game: "", winner: false }
+            ],
+            prediction: {
+              confidence: 0.72,
+              players: [
+                {
+                  name: "Alexander Zverev",
+                  probability: 0.61,
+                  rank: 3,
+                  stats: { totalMatches: 52, lastFive: "4-1", recent: "8-2", clay: "15-5", clayRecent: "8-2" },
+                  factors: { ranking: "#3", lastFive: "4-1", recentForm: "80% z posledních 10", clayForm: "75% na antuce z 20", h2h: "0-0" }
+                },
+                {
+                  name: "Jakub Mensik",
+                  probability: 0.39,
+                  rank: 12,
+                  stats: { totalMatches: 44, lastFive: "3-2", recent: "6-4", clay: "10-8", clayRecent: "5-5" },
+                  factors: { ranking: "#12", lastFive: "3-2", recentForm: "60% z posledních 10", clayForm: "56% na antuce z 18", h2h: "0-0" }
+                }
+              ]
+            },
+            h2h: { total: 0, players: [{ name: "Alexander Zverev", wins: 0 }, { name: "Jakub Mensik", wins: 0 }], meetings: [] }
+          },
+          {
+            tournament: "Roland-Garros",
+            event: "Men’s Singles",
+            court: "Court Philippe-Chatrier",
+            round: "Semifinále",
+            status: "scheduled",
+            start: "Dnes",
+            players: [
+              { name: "Matteo Arnaldi", seed: null, ranking: 34, sets: [], game: "", winner: false },
+              { name: "Flavio Cobolli", seed: null, ranking: 26, sets: [], game: "", winner: false }
+            ],
+            prediction: {
+              confidence: 0.63,
+              players: [
+                {
+                  name: "Matteo Arnaldi",
+                  probability: 0.47,
+                  rank: 34,
+                  stats: { totalMatches: 39, lastFive: "3-2", recent: "6-4", clay: "11-7", clayRecent: "6-4" },
+                  factors: { ranking: "#34", lastFive: "3-2", recentForm: "60% z posledních 10", clayForm: "61% na antuce z 18", h2h: "0-0" }
+                },
+                {
+                  name: "Flavio Cobolli",
+                  probability: 0.53,
+                  rank: 26,
+                  stats: { totalMatches: 42, lastFive: "4-1", recent: "7-3", clay: "12-7", clayRecent: "7-3" },
+                  factors: { ranking: "#26", lastFive: "4-1", recentForm: "70% z posledních 10", clayForm: "63% na antuce z 19", h2h: "0-0" }
+                }
+              ]
+            },
+            h2h: { total: 0, players: [{ name: "Matteo Arnaldi", wins: 0 }, { name: "Flavio Cobolli", wins: 0 }], meetings: [] }
+          }
+        ],
+        results: [],
+        rankings: [
+          { rank: 3, player: "Alexander Zverev", tour: "ATP", move: 0 },
+          { rank: 12, player: "Jakub Mensik", tour: "ATP", move: 0 },
+          { rank: 26, player: "Flavio Cobolli", tour: "ATP", move: 0 },
+          { rank: 34, player: "Matteo Arnaldi", tour: "ATP", move: 0 }
+        ]
+      };
+    }
+
     let state = {
       mode: "api",
       liveEndpoint: dashboardApiUrl,
       rankingEndpoint: dashboardApiUrl,
       data: { matches: [], results: [], rankings: [] },
-      bankroll: Number(localStorage.getItem("tennis.bankroll") || 10000),
-      unit: Number(localStorage.getItem("tennis.unit") || 100),
-      odds: JSON.parse(localStorage.getItem("tennis.odds") || "{}"),
-      bets: JSON.parse(localStorage.getItem("tennis.bets") || "[]"),
+      bankroll: storedNumber("tennis.bankroll", 10000),
+      unit: storedNumber("tennis.unit", 100),
+      odds: storedJson("tennis.odds", {}),
+      bets: storedJson("tennis.bets", []),
       usingFallback: false,
       partial: false,
       errors: []
@@ -982,6 +1077,17 @@
       state.usingFallback = Boolean(payload.usingFallback);
       state.partial = Boolean(payload.partial);
       state.errors = payload.errors || [];
+
+      if (!state.data.matches.length || !state.data.rankings.length) {
+        const fallback = clientFallbackData();
+        state.data = {
+          matches: state.data.matches.length ? state.data.matches : fallback.matches,
+          results: state.data.results.length ? state.data.results : fallback.results,
+          rankings: state.data.rankings.length ? state.data.rankings : fallback.rankings
+        };
+        state.partial = true;
+        state.errors = [...state.errors, "fallback board"];
+      }
     }
 
     function statusLabel(match) {
@@ -1339,8 +1445,8 @@
       try {
         await loadApiData();
       } catch (error) {
-        state.data = { matches: [], results: [], rankings: [] };
-        state.errors = [`Lokální stahovač je nedostupný: ${error.message}`];
+        state.data = clientFallbackData();
+        state.errors = [`API nedostupné: ${error.message}`, "fallback board"];
         state.partial = true;
       }
 
