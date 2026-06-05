@@ -435,6 +435,41 @@ function parseRolandGarrosMatches(html) {
 }
 
 function fallbackRolandGarrosMatches(date) {
+  if (date === "2026-06-05") {
+    return [
+      {
+        id: "rg-2026-06-05-zverev-mensik",
+        tournament: "Roland-Garros",
+        event: "Men’s Singles",
+        court: "Court Philippe-Chatrier",
+        round: "Semifinále",
+        status: "scheduled",
+        start: "Dnes",
+        server: "",
+        source: "Sky Sports order of play fallback",
+        players: [
+          { name: "Alexander Zverev", seed: "2", ranking: 3, sets: [], game: "", winner: false },
+          { name: "Jakub Mensik", seed: null, ranking: 12, sets: [], game: "", winner: false }
+        ]
+      },
+      {
+        id: "rg-2026-06-05-arnaldi-cobolli",
+        tournament: "Roland-Garros",
+        event: "Men’s Singles",
+        court: "Court Philippe-Chatrier",
+        round: "Semifinále",
+        status: "scheduled",
+        start: "Dnes",
+        server: "",
+        source: "Sky Sports order of play fallback",
+        players: [
+          { name: "Matteo Arnaldi", seed: null, ranking: null, sets: [], game: "", winner: false },
+          { name: "Flavio Cobolli", seed: null, ranking: null, sets: [], game: "", winner: false }
+        ]
+      }
+    ];
+  }
+
   if (date !== "2026-06-04") return [];
 
   return [
